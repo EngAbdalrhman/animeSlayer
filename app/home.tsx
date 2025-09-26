@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 
 import { useEffect, useState } from "react";
 import AnimeCard from "../components/AnimeCard";
-import { get } from "./utils/rest";
+import { get } from "../utils/rest";
 
 const mockData = [
   {
