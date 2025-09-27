@@ -30,6 +30,13 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="anime/[id]"
+          options={{
+            headerShown: false,
+            title: "Anime Details",
+          }}
+        />
+        <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
         />

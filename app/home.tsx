@@ -1,22 +1,11 @@
-import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import AnimeCard from "../components/AnimeCard";
 import { get } from "../utils/rest";
 
-const mockData = [
-  {
-    id: "1",
-    title: "Cat's Eye",
-    imageUrl: "https://cdn.myanimelist.net/images/anime/4/19644.jpg",
-    episodeInfo: "الحلقة 1",
-    status: "مستمر",
-    rating: 8.1,
-  },
-  // ...add more mock items or fetch from API
-];
-
 export default function Home() {
+  const router = useRouter();
   const [animeList, setAnimeList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,8 +23,6 @@ export default function Home() {
       );
       setLoading(false);
     });
-    // setAnimeList(mockData);
-    // setLoading(false);
   }, []);
 
   if (loading) {
@@ -56,10 +43,9 @@ export default function Home() {
         <AnimeCard
           title={item.title}
           imageUrl={item.imageUrl}
-          // episodeInfo={item.episodeInfo}
           status={item.status}
           rating={item.rating}
-          onPress={() => {}}
+          onPress={() => router.push(`/anime/${item.id}` as any)}
         />
       )}
     />
