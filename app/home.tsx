@@ -2,14 +2,23 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 
 import { useEffect, useState } from "react";
 import AnimeCard from "../components/AnimeCard";
-import Header from "../components/Header";
-import SideMenu from "../components/SideMenu";
 import { get } from "../utils/rest";
+
+const mockData = [
+  {
+    id: "1",
+    title: "Cat's Eye",
+    imageUrl: "https://cdn.myanimelist.net/images/anime/4/19644.jpg",
+    episodeInfo: "الحلقة 1",
+    status: "مستمر",
+    rating: 8.1,
+  },
+  // ...add more mock items or fetch from API
+];
 
 export default function Home() {
   const [animeList, setAnimeList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sideMenuVisible, setSideMenuVisible] = useState(false);
 
   useEffect(() => {
     get<any>("https://api.jikan.moe/v4/top/anime").then((data) => {
@@ -25,55 +34,63 @@ export default function Home() {
       );
       setLoading(false);
     });
+    // setAnimeList(mockData);
+    // setLoading(false);
   }, []);
-
-  const handleMenuPress = () => {
-    setSideMenuVisible(true);
-  };
-
-  const handleMenuClose = () => {
-    setSideMenuVisible(false);
-  };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Header onMenuPress={handleMenuPress} />
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#2196F3" />
-        </View>
-        <SideMenu isVisible={sideMenuVisible} onClose={handleMenuClose} />
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#2196F3" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Header onMenuPress={handleMenuPress} />
-      <FlatList
-        data={animeList}
-        keyExtractor={(item) => item.id}
-        numColumns={3}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <AnimeCard
-            title={item.title}
-            imageUrl={item.imageUrl}
-            status={item.status}
-            rating={item.rating}
-            onPress={() => {}}
-          />
-        )}
-      />
-      <SideMenu isVisible={sideMenuVisible} onClose={handleMenuClose} />
-    </View>
+    <FlatList
+      data={animeList}
+      keyExtractor={(item) => item.id}
+      numColumns={3}
+      contentContainerStyle={styles.list}
+      renderItem={({ item }) => (
+        <AnimeCard
+          title={item.title}
+          imageUrl={item.imageUrl}
+          // episodeInfo={item.episodeInfo}
+          status={item.status}
+          rating={item.rating}
+          onPress={() => {}}
+        />
+      )}
+    />
   );
 }
 
 const styles = StyleSheet.create({
+  headerImage: {
+    color: "#808080",
+    bottom: -90,
+    left: -35,
+    position: "absolute",
+  },
+  titleContainer: {
+    flexDirection: "row",
+    gap: 8,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  description: {
+    fontSize: 16,
+    textAlign: "center",
+    marginHorizontal: 20,
   },
   list: {
     padding: 8,
