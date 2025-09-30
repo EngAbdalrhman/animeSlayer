@@ -5,10 +5,10 @@ import { Tabs } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
-// import { SearchBar } from "react-native-screens";
 
 export default function Layout() {
   const [showSearch, setShowSearch] = useState(false);
+  // const [searchText, setSearchText] = useState("");
 
   const handleSearchToggle = () => {
     setShowSearch(true);
