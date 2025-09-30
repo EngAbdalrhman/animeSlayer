@@ -8,7 +8,7 @@ import "react-native-reanimated";
 
 export default function Layout() {
   const [showSearch, setShowSearch] = useState(false);
-  // const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   const handleSearchToggle = () => {
     setShowSearch(true);
@@ -42,6 +42,8 @@ export default function Layout() {
           headerRight: () =>
             showSearch ? (
               <SearchBar
+                value={searchText}
+                onChangeText={setSearchText}
                 onBlur={handleSearchBlur}
                 onSubmit={handleSearchSubmit}
               />
