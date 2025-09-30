@@ -1,14 +1,29 @@
+import SearchBar from "@/components/SearchBar";
 import TabIcon from "@/components/TabIcon";
 import { icons } from "@/constants/icons";
 import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
+import { useState } from "react";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
-// import { Image } from "react-native-reanimated/lib/typescript/Animated";
-// import { SafeAreaView } from "react-native-safe-area-context";
+// import { SearchBar } from "react-native-screens";
 
 export default function Layout() {
+  const [showSearch, setShowSearch] = useState(false);
+
+  const handleSearchToggle = () => {
+    setShowSearch(true);
+  };
+
+  const handleSearchBlur = () => {
+    setShowSearch(false);
+  };
+
+  const handleSearchSubmit = (text: string) => {
+    console.log("Search submitted:", text);
+    // ToDO: Navigate to search results page
+  };
+
   return (
-    // <SafeAreaView>
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
@@ -19,12 +34,26 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
+          headerShown: true,
           title: "",
           tabBarIcon: ({ focused }) => (
-            // <MaterialIcons name="home" size={24} color={color} />
             <TabIcon icon={icons.home} title={"Home"} focused={focused} />
           ),
+          headerRight: () =>
+            showSearch ? (
+              <SearchBar
+                onBlur={handleSearchBlur}
+                onSubmit={handleSearchSubmit}
+              />
+            ) : (
+              <TouchableOpacity onPress={handleSearchToggle}>
+                <Image
+                  source={icons.search}
+                  style={{ width: 24, height: 24, marginRight: 10 }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            ),
         }}
       />
 
@@ -50,7 +79,6 @@ export default function Layout() {
         }}
       />
     </Tabs>
-    // </SafeAreaView>
   );
 }
 
