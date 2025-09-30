@@ -1,14 +1,14 @@
 import SearchBar from "@/components/SearchBar";
 import TabIcon from "@/components/TabIcon";
 import { icons } from "@/constants/icons";
+import { useSearch } from "@/contexts/SearchContext";
 import { Tabs } from "expo-router";
-import { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 
 export default function Layout() {
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const { searchQuery, setSearchQuery, showSearch, setShowSearch } =
+    useSearch();
 
   const handleSearchToggle = () => {
     setShowSearch(true);
@@ -16,11 +16,12 @@ export default function Layout() {
 
   const handleSearchBlur = () => {
     setShowSearch(false);
+    setSearchQuery("");
   };
 
   const handleSearchSubmit = (text: string) => {
-    console.log("Search submitted:", text);
-    // ToDO: Navigate to search results page
+    setSearchQuery(text);
+    setShowSearch(false);
   };
 
   return (
@@ -42,8 +43,8 @@ export default function Layout() {
           headerRight: () =>
             showSearch ? (
               <SearchBar
-                value={searchText}
-                onChangeText={setSearchText}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
                 onBlur={handleSearchBlur}
                 onSubmit={handleSearchSubmit}
               />

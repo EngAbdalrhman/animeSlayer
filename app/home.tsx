@@ -1,11 +1,19 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import AnimeCard from "../components/AnimeCard";
+import { useSearch } from "../contexts/SearchContext";
 import { get } from "../utils/restful";
 
 export default function Home() {
   const router = useRouter();
+  const { searchQuery } = useSearch();
   const [animeList, setAnimeList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +33,18 @@ export default function Home() {
     });
   }, []);
 
+  // Filter anime list based on search query
+  const filteredAnimeList = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return animeList;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return animeList.filter((anime) =>
+      anime.title.toLowerCase().includes(query)
+    );
+  }, [animeList, searchQuery]);
+
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -35,10 +55,19 @@ export default function Home() {
 
   return (
     <FlatList
-      data={animeList}
+      data={filteredAnimeList}
       keyExtractor={(item) => item.id}
       numColumns={3}
       contentContainerStyle={styles.list}
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            {searchQuery
+              ? `No anime found for "${searchQuery}"`
+              : "No anime available"}
+          </Text>
+        </View>
+      }
       renderItem={({ item }) => (
         <AnimeCard
           title={item.title}
@@ -86,5 +115,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    minHeight: 200,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
   },
 });
