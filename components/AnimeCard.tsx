@@ -27,7 +27,11 @@ const AnimeCard: React.FC<AnimeCardProps> = ({
     >
       <Image source={{ uri: imageUrl }} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.episode} numberOfLines={1}>
+        <Text
+          style={styles.episode}
+          className="text-light-200"
+          numberOfLines={1}
+        >
           {episodeInfo}
         </Text>
         <Text style={styles.title} numberOfLines={1}>
