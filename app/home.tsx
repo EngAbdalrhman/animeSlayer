@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import AnimeCard from "../components/AnimeCard";
-import { get } from "../utils/rest";
+import { get } from "../utils/restful";
 
 export default function Home() {
   const router = useRouter();

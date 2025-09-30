@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { get } from "../../utils/rest";
+import { get } from "../../utils/restful";
 
 interface AnimeDetail {
   mal_id: number;
@@ -216,17 +216,21 @@ export default function AnimeDetail() {
             <Text style={styles.bold}>Rank:</Text> #{anime.rank || "N/A"}
           </Text>
           <Text style={styles.additionalInfoText}>
-            <Text style={styles.bold}>Popularity:</Text> #{anime.popularity || "N/A"}
+            <Text style={styles.bold}>Popularity:</Text> #
+            {anime.popularity || "N/A"}
           </Text>
           <Text style={styles.additionalInfoText}>
-            <Text style={styles.bold}>Members:</Text> {anime.members?.toLocaleString() || "N/A"}
+            <Text style={styles.bold}>Members:</Text>{" "}
+            {anime.members?.toLocaleString() || "N/A"}
           </Text>
           <Text style={styles.additionalInfoText}>
-            <Text style={styles.bold}>Favorites:</Text> {anime.favorites?.toLocaleString() || "N/A"}
+            <Text style={styles.bold}>Favorites:</Text>{" "}
+            {anime.favorites?.toLocaleString() || "N/A"}
           </Text>
           {anime.aired && (
             <Text style={styles.additionalInfoText}>
-              <Text style={styles.bold}>Aired:</Text> {anime.aired.string || "Unknown"}
+              <Text style={styles.bold}>Aired:</Text>{" "}
+              {anime.aired.string || "Unknown"}
             </Text>
           )}
           {anime.source && (
