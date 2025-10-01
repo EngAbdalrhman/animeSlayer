@@ -7,7 +7,7 @@ import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 
 export default function Layout() {
-  const { searchQuery, setSearchQuery, showSearch, setShowSearch } =
+  const { searchQuery, setSearchQuery, showSearch, setShowSearch, activeTab } =
     useSearch();
 
   const handleSearchToggle = () => {
@@ -16,13 +16,16 @@ export default function Layout() {
 
   const handleSearchBlur = () => {
     setShowSearch(false);
-    setSearchQuery("");
   };
 
   const handleSearchSubmit = (text: string) => {
     setSearchQuery(text);
     setShowSearch(false);
   };
+
+  // Update search placeholder based on active tab
+  const searchPlaceholder =
+    activeTab === "anime" ? "ابحث عن أنمي..." : "Search for a movie...";
 
   return (
     <Tabs
@@ -47,6 +50,7 @@ export default function Layout() {
                 onChangeText={setSearchQuery}
                 onBlur={handleSearchBlur}
                 onSubmit={handleSearchSubmit}
+                placeholder={searchPlaceholder}
               />
             ) : (
               <TouchableOpacity onPress={handleSearchToggle}>

@@ -1,12 +1,12 @@
-import {
-  View,
-  Text,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { icons } from "@/constants/icons";
@@ -45,6 +45,19 @@ const Details = () => {
   return (
     <View className="bg-primary flex-1">
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+        {/* Header with back button */}
+        {/* <View className="h-20 flex-row items-center bg-primary pt-40 pb-16">
+          <TouchableOpacity className="p-4 mr-16" onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text
+            className="text-white flex-1 text-l font-bold"
+            numberOfLines={1}
+          >
+            {movie?.title}
+          </Text>
+        </View> */}
+        {/* Movie */}
         <View>
           <Image
             source={{

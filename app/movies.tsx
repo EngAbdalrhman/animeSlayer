@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -18,8 +17,6 @@ import MovieCard from "@/components/MovieCard";
 import TrendingCard from "@/components/TrendingCard";
 
 const Index = () => {
-  const router = useRouter();
-
   const {
     data: trendingMovies,
     loading: trendingLoading,
@@ -57,13 +54,6 @@ const Index = () => {
           <Text>Error: {moviesError?.message || trendingError?.message}</Text>
         ) : (
           <View className="flex-1 mt-5">
-            {/* <SearchBar
-              onPress={() => {
-                router.push("/search");
-              }}
-              placeholder="Search for a movie"
-            /> */}
-
             {trendingMovies && (
               <View className="mt-10">
                 <Text className="text-lg text-white font-bold mb-3">
@@ -99,7 +89,7 @@ const Index = () => {
                 columnWrapperStyle={{
                   justifyContent: "flex-start",
                   gap: 20,
-                  paddingRight: 5,
+                  padding: 8,
                   marginBottom: 10,
                 }}
                 className="mt-2 pb-32"

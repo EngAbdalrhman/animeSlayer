@@ -43,6 +43,14 @@ export default function RootLayout() {
               title: "Anime Details",
             }}
           />
+
+          <Stack.Screen
+            name="movie/[id]"
+            options={{
+              headerShown: false,
+              title: "Movie Details",
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

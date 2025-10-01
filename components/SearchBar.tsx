@@ -6,7 +6,14 @@ const SearchBar: React.FC<{
   onChangeText: (text: string) => void;
   onBlur: () => void;
   onSubmit: (text: string) => void;
-}> = ({ value, onChangeText, onBlur, onSubmit }) => {
+  placeholder?: string;
+}> = ({
+  value,
+  onChangeText,
+  onBlur,
+  onSubmit,
+  placeholder = "ابحث عن أنمي...",
+}) => {
   return (
     <View className="flex-row items-center bg-[#1C1B2E] rounded-full h-10 w-72 px-4 border border-[#AB8BFF] shadow-lg mx-2">
       <Image
@@ -18,7 +25,7 @@ const SearchBar: React.FC<{
       <TextInput
         autoFocus
         value={value}
-        placeholder="ابحث عن أنمي..."
+        placeholder={placeholder}
         placeholderTextColor="#A8B5DB"
         className="flex-1 text-white text-[13px] tracking-wide"
         onChangeText={onChangeText}
