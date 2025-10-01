@@ -15,12 +15,19 @@ export default function Layout() {
   };
 
   const handleSearchBlur = () => {
-    setShowSearch(false);
+    // Only close search bar if there's no query
+    if (!searchQuery.trim()) {
+      setShowSearch(false);
+    }
   };
 
   const handleSearchSubmit = (text: string) => {
     setSearchQuery(text);
-    setShowSearch(false);
+    // Keep search bar open after submit
+  };
+
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
   };
 
   // Update search placeholder based on active tab
@@ -47,7 +54,7 @@ export default function Layout() {
             showSearch ? (
               <SearchBar
                 value={searchQuery}
-                onChangeText={setSearchQuery}
+                onChangeText={handleSearchChange}
                 onBlur={handleSearchBlur}
                 onSubmit={handleSearchSubmit}
                 placeholder={searchPlaceholder}

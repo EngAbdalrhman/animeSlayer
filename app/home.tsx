@@ -29,7 +29,10 @@ export default function Home() {
   // Movie state
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [movieLoading, setMovieLoading] = useState(false);
+  const [movieLoadingMore, setMovieLoadingMore] = useState(false);
   const [movieError, setMovieError] = useState<string | null>(null);
+  const [moviePage, setMoviePage] = useState(1);
+  const [movieHasMore, setMovieHasMore] = useState(true);
 
   // Load anime on initial mount
   useEffect(() => {
@@ -105,13 +108,22 @@ export default function Home() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, activeTab]);
 
-  // Load more anime data (only when not searching)
+  // Load more anime data (works for both search and top anime)
   const loadMoreAnime = useCallback(() => {
-    if (animeLoadingMore || animeLoading || !animeHasMore || searchQuery.trim())
-      return;
+    if (animeLoadingMore || animeLoading || !animeHasMore) return;
+
     setAnimeLoadingMore(true);
-    get<any>(`https://api.jikan.moe/v4/top/anime?page=${animePage + 1}`).then(
-      (data) => {
+    const nextPage = animePage + 1;
+
+    // Build URL based on whether we're searching or browsing
+    const url = searchQuery.trim()
+      ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
+          searchQuery
+        )}&sfw=false&page=${nextPage}`
+      : `https://api.jikan.moe/v4/top/anime?page=${nextPage}`;
+
+    get<any>(url)
+      .then((data) => {
         setAnimeList((prev) => [
           ...prev,
           ...data.data.map((item: any) => ({
@@ -122,11 +134,14 @@ export default function Home() {
             rating: item.score,
           })),
         ]);
-        setAnimePage((prev) => prev + 1);
+        setAnimePage(nextPage);
         setAnimeHasMore(data.pagination?.has_next_page ?? false);
         setAnimeLoadingMore(false);
-      }
-    );
+      })
+      .catch((err) => {
+        console.error("Error loading more anime:", err);
+        setAnimeLoadingMore(false);
+      });
   }, [animeLoadingMore, animeLoading, animeHasMore, animePage, searchQuery]);
 
   // Debounced movie search effect
@@ -138,12 +153,14 @@ export default function Home() {
         try {
           setMovieLoading(true);
           setMovieError(null);
-          const movies = await fetchMovies({ query: searchQuery });
-          setMovieList(movies);
+          const response = await fetchMovies({ query: searchQuery, page: 1 });
+          setMovieList(response.results);
+          setMoviePage(1);
+          setMovieHasMore(response.page < response.total_pages);
 
           // Update search count if there are results
-          if (movies?.length > 0 && movies[0]) {
-            await updateSearchCount(searchQuery, movies[0]);
+          if (response.results?.length > 0 && response.results[0]) {
+            await updateSearchCount(searchQuery, response.results[0]);
           }
         } catch (err) {
           setMovieError(
@@ -157,8 +174,10 @@ export default function Home() {
         try {
           setMovieLoading(true);
           setMovieError(null);
-          const movies = await fetchMovies({ query: "" });
-          setMovieList(movies);
+          const response = await fetchMovies({ query: "", page: 1 });
+          setMovieList(response.results);
+          setMoviePage(1);
+          setMovieHasMore(response.page < response.total_pages);
         } catch (err) {
           setMovieError(
             err instanceof Error ? err.message : "Failed to fetch movies"
@@ -171,6 +190,26 @@ export default function Home() {
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery, activeTab]);
+
+  // Load more movies data (works for both search and popular movies)
+  const loadMoreMovies = useCallback(() => {
+    if (movieLoadingMore || movieLoading || !movieHasMore) return;
+
+    setMovieLoadingMore(true);
+    const nextPage = moviePage + 1;
+
+    fetchMovies({ query: searchQuery.trim(), page: nextPage })
+      .then((response) => {
+        setMovieList((prev) => [...prev, ...response.results]);
+        setMoviePage(nextPage);
+        setMovieHasMore(response.page < response.total_pages);
+        setMovieLoadingMore(false);
+      })
+      .catch((err) => {
+        console.error("Error loading more movies:", err);
+        setMovieLoadingMore(false);
+      });
+  }, [movieLoadingMore, movieLoading, movieHasMore, moviePage, searchQuery]);
 
   // Handle tab change
   const handleTabChange = (tab: ContentType) => {
@@ -280,7 +319,7 @@ export default function Home() {
           contentContainerStyle={styles.list}
           ListHeaderComponent={
             <>
-              {movieLoading && (
+              {movieLoading && movieList.length === 0 && (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="large" color="#2196F3" />
                 </View>
@@ -314,6 +353,15 @@ export default function Home() {
             ) : null
           }
           renderItem={({ item }) => <MovieCard {...item} />}
+          onEndReached={loadMoreMovies}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            movieLoadingMore ? (
+              <View style={{ padding: 16 }}>
+                <ActivityIndicator size="small" color="#2196F3" />
+              </View>
+            ) : null
+          }
         />
       )}
     </View>
