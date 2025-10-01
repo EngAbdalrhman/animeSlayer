@@ -21,38 +21,40 @@ export default function RootLayout() {
   return (
     <SearchProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-              title: "",
-            }}
-          />
-          <Stack.Screen
-            name="index"
-            options={{
-              headerShown: true,
-              title: "",
-            }}
-          />
-          <Stack.Screen
-            name="anime/[id]"
-            options={{
-              headerShown: false,
-              title: "Anime Details",
-            }}
-          />
+        <>
+          <StatusBar style="auto" hidden={true} />
+          <Stack>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+                title: "",
+              }}
+            />
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: true,
+                title: "",
+              }}
+            />
+            <Stack.Screen
+              name="anime/[id]"
+              options={{
+                headerShown: false,
+                title: "Anime Details",
+              }}
+            />
 
-          <Stack.Screen
-            name="movie/[id]"
-            options={{
-              headerShown: false,
-              title: "Movie Details",
-            }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
+            <Stack.Screen
+              name="movie/[id]"
+              options={{
+                headerShown: false,
+                title: "Movie Details",
+              }}
+            />
+          </Stack>
+        </>
       </ThemeProvider>
     </SearchProvider>
   );

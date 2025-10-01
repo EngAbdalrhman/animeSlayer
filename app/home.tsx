@@ -63,7 +63,7 @@ export default function Home() {
           const data = await get<any>(
             `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
               searchQuery
-            )}&sfw=false`
+            )}&sfw=true`
           );
           setAnimeList(
             data.data.map((item: any) => ({
