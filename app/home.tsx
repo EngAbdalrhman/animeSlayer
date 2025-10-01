@@ -1,5 +1,6 @@
+import MovieCard from "@/components/MovieCard";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -13,7 +14,6 @@ import { ContentType, useSearch } from "../contexts/SearchContext";
 import { fetchMovies } from "../service/fetchMovies";
 import { updateSearchCount } from "../utils/appwrite";
 import { get } from "../utils/restful";
-import MovieCard from "@/components/MovieCard";
 
 export default function Home() {
   const router = useRouter();
@@ -49,9 +49,66 @@ export default function Home() {
     });
   }, []);
 
-  // Load more anime data
+  // Debounced anime search effect
+  useEffect(() => {
+    if (activeTab !== "anime") return;
+
+    const timeoutId = setTimeout(async () => {
+      if (searchQuery.trim()) {
+        try {
+          setAnimeLoading(true);
+          const data = await get<any>(
+            `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
+              searchQuery
+            )}&sfw=false`
+          );
+          setAnimeList(
+            data.data.map((item: any) => ({
+              id: String(item.mal_id),
+              title: item.title,
+              imageUrl: item.images.jpg.image_url,
+              status: item.status === "Currently Airing" ? "مستمر" : "مكتمل",
+              rating: item.score,
+            }))
+          );
+          setAnimeHasMore(data.pagination?.has_next_page ?? false);
+          setAnimePage(1);
+        } catch (err) {
+          console.error("Error searching anime:", err);
+        } finally {
+          setAnimeLoading(false);
+        }
+      } else {
+        // Load top anime when no search query
+        try {
+          setAnimeLoading(true);
+          const data = await get<any>("https://api.jikan.moe/v4/top/anime");
+          setAnimeList(
+            data.data.map((item: any) => ({
+              id: String(item.mal_id),
+              title: item.title,
+              imageUrl: item.images.jpg.image_url,
+              status: item.status === "Currently Airing" ? "مستمر" : "مكتمل",
+              rating: item.score,
+            }))
+          );
+          setAnimeHasMore(data.pagination?.has_next_page ?? false);
+          setAnimePage(1);
+        } catch (err) {
+          console.error("Error loading anime:", err);
+        } finally {
+          setAnimeLoading(false);
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, activeTab]);
+
+  // Load more anime data (only when not searching)
   const loadMoreAnime = useCallback(() => {
-    if (animeLoadingMore || animeLoading || !animeHasMore) return;
+    if (animeLoadingMore || animeLoading || !animeHasMore || searchQuery.trim())
+      return;
     setAnimeLoadingMore(true);
     get<any>(`https://api.jikan.moe/v4/top/anime?page=${animePage + 1}`).then(
       (data) => {
@@ -70,7 +127,7 @@ export default function Home() {
         setAnimeLoadingMore(false);
       }
     );
-  }, [animeLoadingMore, animeLoading, animeHasMore, animePage]);
+  }, [animeLoadingMore, animeLoading, animeHasMore, animePage, searchQuery]);
 
   // Debounced movie search effect
   useEffect(() => {
@@ -115,25 +172,14 @@ export default function Home() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, activeTab]);
 
-  // Filter anime list based on search query
-  const filteredAnimeList = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return animeList;
-    }
-    const query = searchQuery.toLowerCase();
-    return animeList.filter((anime) =>
-      anime.title.toLowerCase().includes(query)
-    );
-  }, [animeList, searchQuery]);
-
   // Handle tab change
   const handleTabChange = (tab: ContentType) => {
     setActiveTab(tab);
     setSearchQuery(""); // Clear search when switching tabs
   };
 
-  // Show loading for initial anime load
-  if (animeLoading && animeList.length === 0) {
+  // Show loading for initial anime load only
+  if (animeLoading && animeList.length === 0 && !searchQuery) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#2196F3" />
@@ -176,27 +222,36 @@ export default function Home() {
       {/* Content based on active tab */}
       {activeTab === "anime" ? (
         <FlatList
-          data={filteredAnimeList}
+          data={animeList}
           keyExtractor={(item) => item.id}
           numColumns={3}
           contentContainerStyle={styles.list}
           ListHeaderComponent={
-            searchQuery && filteredAnimeList.length > 0 ? (
-              <View style={styles.searchResultHeader}>
-                <Text style={styles.searchResultText}>
-                  Results for {searchQuery}
+            <>
+              {animeLoading && animeList.length === 0 && (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#2196F3" />
+                </View>
+              )}
+              {searchQuery && animeList.length > 0 && !animeLoading && (
+                <View style={styles.searchResultHeader}>
+                  <Text style={styles.searchResultText}>
+                    Results for {searchQuery}
+                  </Text>
+                </View>
+              )}
+            </>
+          }
+          ListEmptyComponent={
+            !animeLoading ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
+                  {searchQuery
+                    ? `No anime found for "${searchQuery}"`
+                    : "No anime available"}
                 </Text>
               </View>
             ) : null
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                {searchQuery
-                  ? `No anime found for "${searchQuery}"`
-                  : "No anime available"}
-              </Text>
-            </View>
           }
           renderItem={({ item }) => (
             <AnimeCard
